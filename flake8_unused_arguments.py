@@ -174,7 +174,7 @@ class Plugin:
                 if (
                     self.ignore_cls_in_pydantic_validator
                     and "validator" in decorator_names
-                    and argument == "cls"
+                    and name == "cls"
                 ):
                     continue
 
