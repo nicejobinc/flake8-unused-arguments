@@ -172,7 +172,7 @@ class Plugin:
                 # ignore cls in pydantic validator
                 if (
                     self.ignore_cls_in_pydantic_validator
-                    and "validator" in decorator_names
+                    and len({"root_validator", "validator"} & set(decorator_names)) > 0
                     and name == "cls"
                 ):
                     continue
