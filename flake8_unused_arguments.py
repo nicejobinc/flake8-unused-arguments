@@ -5,7 +5,6 @@ from typing import Iterable, List, Tuple, Union
 
 import flake8.options.manager
 
-
 FunctionTypes = Union[ast.AsyncFunctionDef, ast.FunctionDef, ast.Lambda]
 LintResult = Tuple[int, int, str, str]
 
@@ -22,6 +21,7 @@ class Plugin:
     ignore_lambdas = False
     ignore_nested_functions = False
     ignore_dunder_methods = False
+    ignore_cls_in_pydantic_validator = False
 
     def __init__(self, tree: ast.Module):
         self.tree = tree
@@ -106,6 +106,18 @@ class Plugin:
             ),
         )
 
+        option_manager.add_option(
+            "--unused-arguments-ignore-cls-in-pydantic-validator",
+            action="store_true",
+            parse_from_config=True,
+            default=cls.ignore_cls_in_pydantic_validator,
+            dest="unused_arguments_ignore_cls_in_pydantic_validator",
+            help=(
+                "If provided, the cls argument in a Pydantic validator is not considered an "
+                "unused argument."
+            ),
+        )
+
     @classmethod
     def parse_options(cls, options: optparse.Values) -> None:
         cls.ignore_abstract = options.unused_arguments_ignore_abstract_functions
@@ -116,6 +128,7 @@ class Plugin:
         cls.ignore_lambdas = options.unused_arguments_ignore_lambdas
         cls.ignore_nested_functions = options.unused_arguments_ignore_nested_functions
         cls.ignore_dunder_methods = options.unused_arguments_ignore_dunder_methods
+        cls.ignore_cls_in_pydantic_validator = options.unused_arguments_ignore_cls_in_pydantic_validator
 
     def run(self) -> Iterable[LintResult]:
         finder = FunctionFinder(self.ignore_nested_functions)
@@ -158,8 +171,9 @@ class Plugin:
 
                 # ignore cls in pydantic validator
                 if (
-                    name == "cls"
+                    self.ignore_cls_in_pydantic_validator
                     and "validator" in decorator_names
+                    and name == "cls"
                 ):
                     continue
 
