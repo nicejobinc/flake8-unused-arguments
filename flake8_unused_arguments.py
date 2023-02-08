@@ -111,7 +111,7 @@ class Plugin:
             "--unused-arguments-ignore-cls-in-pydantic-validator",
             action="store_true",
             parse_from_config=True,
-            default=cls.ignore_dunder_methods,
+            default=cls.ignore_cls_in_pydantic_validator,
             dest="unused_arguments_ignore_cls_in_pydantic_validator",
             help=(
                 "If provided, the cls argument of all methods decorated with @validator and "
@@ -173,8 +173,8 @@ class Plugin:
                 # ignore cls in pydantic validator
                 if (
                     self.ignore_cls_in_pydantic_validator
-                    and "validator" in decorator_names
                     and name == "cls"
+                    and "validator" in decorator_names
                 ):
                     continue
 
